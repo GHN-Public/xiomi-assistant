@@ -16,12 +16,55 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Initialize Android Project Structure
+      - name: Setup Basic Android Files
         run: |
-          if [ ! -f settings.gradle.kts ] && [ ! -f settings.gradle ]; then
-            echo 'rootProject.name = "xiomi-assistant"' > settings.gradle.kts
-            echo 'include(":app")' >> settings.gradle.kts
-          fi
+          # 1. Tạo root settings.gradle.kts
+          echo 'rootProject.name = "xiomi-assistant"' > settings.gradle.kts
+          echo 'include(":app")' >> settings.gradle.kts
+
+          # 2. Tạo root build.gradle.kts
+          cat << 'EOF' > build.gradle.kts
+          buildscript {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+              dependencies {
+                  classpath("com.android.tools.build:gradle:8.2.2")
+                  classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
+              }
+          }
+          allprojects {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          EOF
+
+          # 3. Tạo app/build.gradle.kts chuẩn
+          mkdir -p app
+          cat << 'EOF' > app/build.gradle.kts
+          plugins {
+              id("com.android.application")
+              id("org.jetbrains.kotlin.android")
+          }
+
+          android {
+              namespace = "com.example.xiomiassistant"
+              compileSdk = 34
+
+              defaultConfig {
+                  applicationId = "com.example.xiomiassistant"
+                  minSdk = 24
+                  targetSdk = 34
+                  versionCode = 1
+                  versionName = "1.0"
+              }
+          }
+          EOF
+
+          # 4. Khởi tạo Gradle Wrapper
           gradle wrapper --gradle-version 8.2.2
           chmod +x gradlew
 
