@@ -88,13 +88,38 @@ jobs:
           }
           EOF
 
-          # 5. AndroidManifest.xml
+          # 5. Khởi tạo mã nguồn Kotlin đã bổ sung đầy đủ import
+          mkdir -p app/src/main/java/com/xiomi/assistant
+          
+          cat << 'EOF' > app/src/main/java/com/xiomi/assistant/MainActivity.kt
+          package com.xiomi.assistant
+
+          import android.os.Bundle
+          import androidx.appcompat.app.AppCompatActivity
+          import androidx.core.content.ContextCompat
+
+          class MainActivity : AppCompatActivity() {
+              override fun onCreate(savedInstanceState: Bundle?) {
+                  super.onCreate(savedInstanceState)
+              }
+          }
+          EOF
+
+          # 6. AndroidManifest.xml
           mkdir -p app/src/main
           cat << 'EOF' > app/src/main/AndroidManifest.xml
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
               <application
                   android:label="Xiomi Assistant"
                   android:supportsRtl="true">
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+                  </activity>
               </application>
           </manifest>
           EOF
