@@ -17,9 +17,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate()
+        super.onCreate(savedInstanceState)
         
-        // 1. Gắn giao diện tĩnh để không bị màn hình trắng
+        // 1. Gắn giao diện để hết màn hình trắng
         val textView = TextView(this).apply {
             text = "Xiomi Assistant đang chạy ngầm..."
             textSize = 20f
