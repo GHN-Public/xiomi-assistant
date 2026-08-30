@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "XiAoMiAssistant"
+rootProject.name = "xiomi-assistant"
 include(":app")
