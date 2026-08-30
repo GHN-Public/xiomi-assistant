@@ -1,73 +1,53 @@
 package com.xiomi.assistant
 
+import android.Manifest
 import android.content.Intent
-import android.os.Build
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import android.Manifest
+import androidx.core.content.ContextCompat
 
 class MainActivity : AppCompatActivity() {
-    
-    companion object {
-        private const val PERMISSION_REQUEST_CODE = 100
-        private val REQUIRED_PERMISSIONS = arrayOf(
-            Manifest.permission.RECORD_AUDIO,
-            Manifest.permission.INTERNET,
-            Manifest.permission.CAMERA,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.MODIFY_AUDIO_SETTINGS
-        )
-    }
+
+    private val REQUEST_RECORD_AUDIO_PERMISSION = 200
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!allPermissionsGranted()) {
-                ActivityCompat.requestPermissions(
-                    this,
-                    REQUIRED_PERMISSIONS,
-                    PERMISSION_REQUEST_CODE
-                )
-            } else {
-                startVoiceAssistant()
-            }
-        } else {
-            startVoiceAssistant()
-        }
+        setContentView(R.layout.activity_main)
+
+        checkAudioPermission()
     }
 
-    private fun allPermissionsGranted(): Boolean {
-        return REQUIRED_PERMISSIONS.all { permission ->
-            android.content.ContextCompat.checkSelfPermission(
+    private fun checkAudioPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+            != PackageManager.PERMISSION_GRANTED) {
+            
+            ActivityCompat.requestPermissions(
                 this,
-                permission
-            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                arrayOf(Manifest.permission.RECORD_AUDIO),
+                REQUEST_RECORD_AUDIO_PERMISSION
+            )
+        } else {
+            startVoiceAssistantService()
         }
     }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
-        permissions: Array<String>,
+        permissions: Array<out String>,
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        
-        if (requestCode == PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults.all { it == android.content.pm.PackageManager.PERMISSION_GRANTED }) {
-                startVoiceAssistant()
+        if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startVoiceAssistantService()
             }
         }
     }
 
-    private fun startVoiceAssistant() {
+    private fun startVoiceAssistantService() {
         val intent = Intent(this, VoiceAssistantService::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(intent)
-        } else {
-            startService(intent)
-        }
-        finish()
+        startService(intent)
     }
 }
