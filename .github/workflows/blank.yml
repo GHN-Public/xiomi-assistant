@@ -23,11 +23,15 @@ jobs:
 
       - name: Generate Clean Android Structure
         run: |
-          # 1. settings.gradle.kts
+          # 1. Bật AndroidX trong gradle.properties
+          echo 'android.useAndroidX=true' > gradle.properties
+          echo 'android.enableJetifier=true' >> gradle.properties
+
+          # 2. settings.gradle.kts
           echo 'rootProject.name = "xiomi-assistant"' > settings.gradle.kts
           echo 'include(":app")' >> settings.gradle.kts
 
-          # 2. Root build.gradle.kts
+          # 3. Root build.gradle.kts
           cat << 'EOF' > build.gradle.kts
           buildscript {
               repositories {
@@ -47,7 +51,7 @@ jobs:
           }
           EOF
 
-          # 3. app/build.gradle.kts (Đã bổ sung AndroidX dependencies)
+          # 4. app/build.gradle.kts
           mkdir -p app
           cat << 'EOF' > app/build.gradle.kts
           plugins {
@@ -84,7 +88,7 @@ jobs:
           }
           EOF
 
-          # 4. AndroidManifest.xml
+          # 5. AndroidManifest.xml
           mkdir -p app/src/main
           cat << 'EOF' > app/src/main/AndroidManifest.xml
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
