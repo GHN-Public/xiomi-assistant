@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
@@ -54,7 +55,7 @@ class VoiceAssistantService : Service() {
                     results?.let {
                         val matches = it.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                         if (!matches.isNullOrEmpty()) {
-                            val spokenText = matches[0].toLowerCase()
+                            val spokenText = matches[0].lowercase()
                             Log.d(TAG, "Recognized: $spokenText")
                             
                             if (wakeWordDetector.isWakeWord(spokenText)) {
@@ -70,8 +71,24 @@ class VoiceAssistantService : Service() {
             })
         }
         
-        startForeground(NOTIFICATION_ID, createNotification())
+        // Khởi chạy Foreground Service tương thích Android 14+
+        startForegroundServiceWithNotification()
+        
         startListening()
+    }
+
+    private fun startForegroundServiceWithNotification() {
+        val notification = createNotification()
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(
+                NOTIFICATION_ID,
+                notification,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+            )
+        } else {
+            startForeground(NOTIFICATION_ID, notification)
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -81,8 +98,10 @@ class VoiceAssistantService : Service() {
     private fun startListening() {
         if (SpeechRecognizer.isRecognitionAvailable(this)) {
             val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            intent.putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+            )
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "vi-VN")
             intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
             
@@ -97,8 +116,10 @@ class VoiceAssistantService : Service() {
 
     private fun listenForCommand() {
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+        intent.putExtra(
+            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+        )
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "vi-VN")
         intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
         
