@@ -47,7 +47,7 @@ jobs:
           }
           EOF
 
-          # 3. app/build.gradle.kts (Đã đồng bộ JVM Target 17)
+          # 3. app/build.gradle.kts (Đã bổ sung AndroidX dependencies)
           mkdir -p app
           cat << 'EOF' > app/build.gradle.kts
           plugins {
@@ -56,11 +56,11 @@ jobs:
           }
 
           android {
-              namespace = "com.example.xiomiassistant"
+              namespace = "com.xiomi.assistant"
               compileSdk = 34
 
               defaultConfig {
-                  applicationId = "com.example.xiomiassistant"
+                  applicationId = "com.xiomi.assistant"
                   minSdk = 24
                   targetSdk = 34
                   versionCode = 1
@@ -75,6 +75,12 @@ jobs:
               kotlinOptions {
                   jvmTarget = "17"
               }
+          }
+
+          dependencies {
+              implementation("androidx.core:core-ktx:1.12.0")
+              implementation("androidx.appcompat:appcompat:1.6.1")
+              implementation("com.google.android.material:material:1.11.0")
           }
           EOF
 
