@@ -16,8 +16,12 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Init Gradle Wrapper
+      - name: Initialize Android Project Structure
         run: |
+          if [ ! -f settings.gradle.kts ] && [ ! -f settings.gradle ]; then
+            echo 'rootProject.name = "xiomi-assistant"' > settings.gradle.kts
+            echo 'include(":app")' >> settings.gradle.kts
+          fi
           gradle wrapper --gradle-version 8.2.2
           chmod +x gradlew
 
