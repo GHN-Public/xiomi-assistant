@@ -16,13 +16,18 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Re-initialize Clean Android Structure
+      - name: Setup Gradle 8.5
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.5'
+
+      - name: Generate Clean Android Structure
         run: |
-          # 1. Ghi đè settings.gradle.kts
+          # 1. settings.gradle.kts
           echo 'rootProject.name = "xiomi-assistant"' > settings.gradle.kts
           echo 'include(":app")' >> settings.gradle.kts
 
-          # 2. Ghi đè build.gradle.kts gốc bằng cú pháp Groovy/Kotlin chuẩn không phụ thuộc libs
+          # 2. Root build.gradle.kts
           cat << 'EOF' > build.gradle.kts
           buildscript {
               repositories {
@@ -42,7 +47,7 @@ jobs:
           }
           EOF
 
-          # 3. Tạo app/build.gradle.kts
+          # 3. app/build.gradle.kts
           mkdir -p app
           cat << 'EOF' > app/build.gradle.kts
           plugins {
@@ -64,7 +69,7 @@ jobs:
           }
           EOF
 
-          # 4. Tạo AndroidManifest.xml tối thiểu
+          # 4. AndroidManifest.xml
           mkdir -p app/src/main
           cat << 'EOF' > app/src/main/AndroidManifest.xml
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
@@ -75,12 +80,8 @@ jobs:
           </manifest>
           EOF
 
-          # 5. Tạo Gradle Wrapper
-          gradle wrapper --gradle-version 8.2.2
-          chmod +x gradlew
-
       - name: Build APK
-        run: ./gradlew assembleDebug --no-daemon -x test
+        run: gradle assembleDebug --no-daemon -x test
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
