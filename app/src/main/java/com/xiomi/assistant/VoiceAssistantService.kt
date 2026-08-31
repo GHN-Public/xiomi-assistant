@@ -66,17 +66,15 @@ class VoiceAssistantService : Service() {
                             Log.d(TAG, "Recognized text: $spokenText")
                             
                             if (isWaitingForCommand) {
-                                // Đang trong trạng thái chờ lệnh -> Xử lý câu lệnh
                                 isWaitingForCommand = false
                                 commandProcessor.processCommand(spokenText)
                             } else if (wakeWordDetector.isWakeWord(spokenText)) {
-                                // Phát hiện Wake Word -> Chuyển sang chờ nhận câu lệnh
                                 isWaitingForCommand = true
-                                commandProcessor.speak("Dạ, tôi nghe")
+                                commandProcessor.speak("Dạ, tôi nghe đây")
                             }
                         }
                     }
-                    restartListeningDelayed(1500)
+                    restartListeningDelayed(2000)
                 }
 
                 override fun onPartialResults(partialResults: Bundle?) {}
